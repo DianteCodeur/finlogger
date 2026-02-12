@@ -2,6 +2,9 @@ import { Table, Col } from "react-bootstrap";
 import DeleteConfirmationModal from "./DeleteConfirmationModal.jsx";
 import { useState } from "react";
 import { useExpenseModal } from "../context/ExpenseModalContext.jsx";
+import { useAppContext } from "../context/AppContext.jsx";
+import React from "react";
+
 
 function updateDateFormat(date) {
     const d1 = new Date(date);
@@ -12,6 +15,8 @@ function updateDateFormat(date) {
 }
 
 function ExpenseDetails ({data}) {
+
+    const { expenseIdToBeDeleted, setExpenseIdToBeDeleted, fetchExpenseData, showToast} = useAppContext();
 
     const { handleShow } = useExpenseModal();
 
@@ -33,10 +38,32 @@ function ExpenseDetails ({data}) {
         }
 
         const handleDelete = () => {
-            handleDMClose();
+            fetch(`http://localhost:3001/expenses/${expenseIdToBeDeleted}`, {
+            method: 'DELETE',
+            })
+            .then(response => {
+                if (!response.ok) {
+                throw new Error(`Failed to delete expense! Response status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                fetchExpenseData();
+                showToast("Expense Deleted successfully!");
+                console.log("Item deleted", data);
+            })
+            .catch(error => {
+                console.error("Error deleting expense:", error);
+                showToast("Error deleting expense!");        
+            })
+            .finally(() => {
+                setExpenseIdToBeDeleted(null);
+                handleDMClose();       
+            });
+            
         }
 
-    const tableItems = data.map((expense) => {
+    const tableItems = data.expenses.map((expense) => {
         return (
             <tr key={expense._id}>
                 <td className="text-nowrap">{updateDateFormat(expense.date)}</td>

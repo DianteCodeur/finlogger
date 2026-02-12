@@ -1,11 +1,16 @@
+import React from "react";
 import {Table, Col} from "react-bootstrap";
 
-function ExpenseSummary({data}) {
-    const tableItems = data.map((dataRow) => {
+export const ExpenseSummary = ({data}) => {
+
+    const tableItems = data.map((expense) => {
+
+        if (!data || !Array.isArray(data)) return null;
+
         return (
-            <tr key={dataRow.categoryName}>
-                <td>{dataRow.categoryName}</td>
-                <td>{dataRow.percentage}</td>
+            <tr key={expense.categoryName}>    
+                <td>{expense.categoryName}</td>
+                <td>{expense.percentage}</td>
             </tr>
         );
     });

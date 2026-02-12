@@ -6,9 +6,9 @@ const ExpenseModalContext = createContext();
 export const ExpenseModalProvider = ({ children }) => { 
     const [showModal, setShowModal] = useState(false);
     const [modalMode, setModalMode] = useState(null);
-    const [modalData, setModalData] = useState({_id: "", description: "", amount: 0, date: "", categoryName: ""});
+    const [modalData, setModalData] = useState({user_id: "", description: "", amount: 0, date: "", categoryName: ""});
 
-    const handleShow = (mode, data) => {
+    const handleShow = (mode, data = {user_id: "", description: "", amount: 0, date: "", categoryName: ""}) => {
         setModalMode(mode);
         setModalData(data);
         setShowModal(true);
@@ -17,7 +17,7 @@ export const ExpenseModalProvider = ({ children }) => {
     const handleClose = () => {
         setShowModal(false);
         setModalMode(null);
-        setModalData({_id: "", description: "", amount: 0, date: "", categoryName: ""});
+        setModalData({user_id: "", description: "", amount: 0, date: "", categoryName: ""});
     }
 
     return (

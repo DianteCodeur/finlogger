@@ -1,12 +1,15 @@
-import { expenseCategories } from "../data";
+import React from "react";
 import { useExpenseModal } from "../context/ExpenseModalContext";
 import {Modal, Button, Form} from "react-bootstrap";
 import { useState } from "react";
+import { useAppContext } from "../context/AppContext";
 
 function ExpenseModal() {
   const { showModal, modalMode, modalData, handleClose } = useExpenseModal();
   const [validated, setValidated] = useState(false);
-  const categories = expenseCategories.categories.map((item) => {
+  const { expenseCategories, fetchExpenseData, showToast } = useAppContext();
+
+  const categories = expenseCategories.map((item) => {
     return (
       <option value={item} key={item}>
         {item}
@@ -17,18 +20,53 @@ function ExpenseModal() {
     const form = document.getElementById("expenseForm");
     event.preventDefault();
     event.stopPropagation();
+    setValidated(true);
     if (form.checkValidity() === false) {
-      setValidated(true);
+      console.log("Form is invalid");
       return;
     }
     setValidated(false);
 
-    if (modalMode === "add") {
-      console.log("Submit Expense");
-    } else {
-      console.log("Save Expense");
-    }
-    handleClose();
+    // Prepare expense data for API call
+    const expenseData = {
+      user_id: "USER_1",
+      description: document.getElementById("description").value,
+      amount: parseFloat(document.getElementById("amount").value),
+      date: document.getElementById("date").value,
+      categoryName: document.getElementById("categoryName").value,
+    };
+
+    // Set API Url and method based on modelMode
+    const apiUrl = modalMode === "add" ? "http://localhost:3001/expenses" :
+                                          `http://localhost:3001/expenses/${modalData._id}`;
+
+    const method = modalMode === "add" ? "POST" : "PUT";
+
+    // Make API call to add or edit expense
+    fetch(apiUrl, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(expenseData),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(result => {
+        console.log(modalMode === "add" ? "Expense submitted successfully:" : "Expense saved successfully:", result);
+        showToast(modalMode === "add" ? "Expense submitted successfully:" : "Expense saved successfully!");
+        fetchExpenseData();
+        handleClose();
+      })
+      .catch(error => {
+        console.error(modalMode === "add" ? "Error submitting expense::" : "Error saving expense:", error);
+        showToast(modalMode === "add" ? "Error submitting expense::" : "Error saving expense!");        
+      });
+    
   };
 
   return (
@@ -40,20 +78,19 @@ function ExpenseModal() {
       </Modal.Header>
       <Modal.Body>
         <Form noValidate validated={validated} id="expenseForm">
-          <Form.Group controlId="expenseForm.dateInput" className="mb-1">
+          <Form.Group className="mb-1" controlId="date">
             <Form.Label>Date</Form.Label>
             <Form.Control
               type="date"
               required
-              defaultValue={
-                modalMode === "add" ? "" : modalData.date.split("T")[0]
-              }
+              defaultValue={modalMode === "add" ? "" : modalData.date.split("T")[0]}
             />
             <Form.Control.Feedback type="invalid">
               Please provide a valid date.
             </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group controlId="expenseForm.category" className="mb-1">
+
+          <Form.Group className="mb-1" controlId="categoryName">
             <Form.Label>Category</Form.Label>
             <Form.Select
               defaultValue={modalMode === "add" ? "" : modalData.categoryName}
@@ -66,7 +103,8 @@ function ExpenseModal() {
               Please select a category.
             </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group controlId="expenseForm.description" className="mb-1">
+
+          <Form.Group className="mb-1" controlId="description">
             <Form.Label>Description</Form.Label>
             <Form.Control
               type="text"
@@ -78,7 +116,8 @@ function ExpenseModal() {
               Please provide a description.
             </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group controlId="expenseForm.amount" className="mb-1">
+
+          <Form.Group className="mb-1" controlId="amount">
             <Form.Label>Amount</Form.Label>
             <Form.Control
               type="number"
