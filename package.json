@@ -1,0 +1,31 @@
+{
+  "name": "finlogger-app",
+  "version": "1.0.0",
+  "description": "FinLogger Application",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "mocha \"tests/**/*.{test.js,spec.js}\""
+  },
+  "dependencies": {
+    "argon2": "^0.44.0",
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "mongod": "^2.0.0",
+    "mongoose": "^9.1.6",
+    "mysql2": "^3.16.2",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "chai": "^6.2.2",
+    "mocha": "^11.7.5",
+    "mongodb-memory-server": "^11.0.1",
+    "supertest": "^7.2.2"
+  }
+}
