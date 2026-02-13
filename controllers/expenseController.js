@@ -167,7 +167,7 @@ export const deleteExpense = async (req, res) => {
     // Return success message with the updated expense
 
     return res.status(200).json({
-      message: "Expense deleted successfully",
+      message: "Expense deleted successfully.",
       expense: updated
     });
     
