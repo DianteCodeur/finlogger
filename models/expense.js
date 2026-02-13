@@ -14,6 +14,8 @@ const expenseSchema = new mongoose.Schema({
 
  category_id: { type: String, ref: "ExpenseCategory", required: true },
 
+ active: { type: Boolean, default: true, index: true },
+
 });
 
 //Create Expense model using expenseSchema

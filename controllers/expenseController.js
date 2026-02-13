@@ -106,7 +106,8 @@ export const updateExpense = (req, res) => {
         description,
         amount,
         date,
-        category_id: category._id
+        category_id: category._id,
+        active: true
         },
         { new: true } // Return the updated document
     );
@@ -143,44 +144,39 @@ export const updateExpense = (req, res) => {
 
 //deleteExpense() function
 
-export const deleteExpense = (req, res) => {
+export const deleteExpense = async (req, res) => {
 
-    // Find and delete the expense
+  try {
 
-    Expense.findByIdAndDelete(req.params.id)
+    const { id } = req.params;
 
-    .then(expense => {
+    // Soft delete by setting active to false
 
-    //If expense do not exist then return status code 400 with error message
+    const updated = await Expense.findByIdAndUpdate(
+      id,
+      { $set: { active: false } },
+      { new: true }
+    );
 
-    if (!expense) {
+    // If no expense was found, return 404
 
-        return res.status(404).json({ error: "Expense not found." });
-
+    if (!updated) {
+      return res.status(404).json({ message: "Expense not found" });
     }
 
-    //Return status code 200 with message
+    // Return success message with the updated expense
 
-    res.status(200).json({
-
-        message: "Expense deleted successfully.",
-
-        deletedExpense: expense,
-
+    return res.status(200).json({
+      message: "Expense deleted successfully",
+      expense: updated
     });
+    
+  } catch (err) {
 
-    })
+    // Log the error and return a 500 status code with an error message
+    return res.status(500).json({ message: "Server error", error: err.message });
 
-    .catch(error => {
-
-    //Return status code 500 with error message
-
-    console.error("Error deleting expense:", error);
-
-    res.status(500).json({ error: "Server error." });
-
-    });
-
+  }
 };
 
 //getExpenses() function
@@ -221,7 +217,7 @@ export const getExpenses = (req, res) => {
 
     if (userId) {
 
-    userFilter = { user_id: userId };
+    userFilter = { user_id: userId, active: true };
 
     }
 
@@ -236,6 +232,8 @@ export const getExpenses = (req, res) => {
     ...dateFilter,
 
     ...userFilter,
+
+    active: true,
 
     },
 
@@ -348,6 +346,8 @@ export const getExpenseSummary = (req, res) => {
         ...userFilter,
 
         ...dateFilter,
+
+        active: true,
 
         },
 
