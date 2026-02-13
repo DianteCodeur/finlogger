@@ -3,9 +3,9 @@ name: Finlogger CI
 # Trigger the workflow on push or pull request to the main branch
 on:
   push:
-    branches: [ main ]
+    branches: [ main, back ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, back ]
 
 jobs:
   build:
