@@ -6,27 +6,27 @@ on:
     branches: [ main, back ]
   pull_request:
     branches: [ main, back ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  test-back:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-    # Step 1 : Checkout the repository code
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-    # Step 2 : Set up Node.js, install dependencies and run tests
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '20'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Run tests
-      run: npm test -- --watchAll=false
-
+      - name: Run tests
+        run: npm test
+        env:
+          CI: true
 
 

@@ -9,7 +9,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "mocha \"tests/**/*.{test.js,spec.js}\""
+    "test": "mocha \"tests/**/*.{test.js,spec.js}\" --timeout 60000",
+    "install:all": "npm install && cd client && npm install",
+    "test:all": "npm test && cd client && npm test",
+    "test:server": "mocha \"tests/**/*.{test.js,spec.js}\" --timeout 60000",
+    "test:client": "cd client && npm test"
   },
   "dependencies": {
     "argon2": "^0.44.0",
